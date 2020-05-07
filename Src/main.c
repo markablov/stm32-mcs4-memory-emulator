@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,11 +97,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
-      HAL_Delay(200);
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-      HAL_Delay(200);
+
     /* USER CODE BEGIN 3 */
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
+    HAL_Delay(200);
+    uint8_t buffer[] = "Hello, World!\r\n";
+    CDC_Transmit_FS(buffer, sizeof(buffer));
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -127,10 +129,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 15;
-  RCC_OscInitStruct.PLL.PLLN = 144;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 72;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 5;
+  RCC_OscInitStruct.PLL.PLLQ = 3;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -162,7 +164,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
   /* USER CODE END Error_Handler_Debug */
 }
 
