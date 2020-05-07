@@ -25,7 +25,7 @@ ENTRY(Reset_Handler)
  * NOTE: The reserved heap and stack will be added to the bss column of the
  * binutils size command.
  */
-_heap_size = 0x200;    /* required amount of heap  */
+_heap_size = 0x1000;    /* required amount of heap  */
 _stack_size = 0x400;   /* required amount of stack */
 
 /*
