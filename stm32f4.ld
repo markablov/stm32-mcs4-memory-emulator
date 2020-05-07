@@ -12,8 +12,8 @@
 
 MEMORY
 {
-    flash (rx) : ORIGIN = 0x08000000, LENGTH = 64K
-    ram  (rwx) : ORIGIN = 0x20000000, LENGTH = 8K
+    flash (rx) : ORIGIN = 0x08000000, LENGTH = 1024K
+    ram  (rwx) : ORIGIN = 0x20000000, LENGTH = 128K
 }
 
 ENTRY(Reset_Handler)
@@ -25,8 +25,8 @@ ENTRY(Reset_Handler)
  * NOTE: The reserved heap and stack will be added to the bss column of the
  * binutils size command.
  */
-_heap_size = 0;    /* required amount of heap  */
-_stack_size = 0x200;   /* required amount of stack */
+_heap_size = 0x200;    /* required amount of heap  */
+_stack_size = 0x400;   /* required amount of stack */
 
 /*
  * The stack starts at the end of RAM and grows downwards. Full-descending
