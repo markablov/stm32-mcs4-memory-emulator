@@ -22,10 +22,10 @@
 #include "main.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "loop.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,11 +99,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
-    HAL_Delay(200);
-    uint8_t buffer[] = "Hello, World!\r\n";
-    CDC_Transmit_FS(buffer, sizeof(buffer));
-    HAL_Delay(1000);
+    loopTick();
   }
   /* USER CODE END 3 */
 }
