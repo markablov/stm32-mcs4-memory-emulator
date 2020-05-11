@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usb_device.h"
 #include "gpio.h"
 
@@ -92,6 +93,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_DEVICE_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
   init();
   /* USER CODE END 2 */
