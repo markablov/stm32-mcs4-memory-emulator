@@ -2,6 +2,14 @@
 #include "tim.h"
 #include "init.h"
 
+/*
+ * For MCS-4 processor we need to provide two-phase clock with period 1350ns (targetFreq = 741kHz) and width 380ns (active LOW)
+ * Distance between two rising (and falling) edges should be: 780ns or 530ns (depends on which clock signal is chosen as first)
+ *
+ * To achieve that master-slave timers are used with same period (frequency): TIM_Period = (timerFreq / targetFreq) - 1 = 168Mhz / 0.741Mhz - 1 = 226
+ * Pulse width should be (TIM_Period + 1) * (targetPeriod / timerPeriod) - 1 = 227 * (970ms / 1350ms) - 1 = 162
+ * Phase offset should be (TIM_Period + 1) * (targetOffset / timerPeriod) - 1 = 227 * (530ms / 1350ms) - 1 = 88
+ */
 void initProcessorClocks() {
   HAL_TIM_Base_Start(&htim8);
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4);
