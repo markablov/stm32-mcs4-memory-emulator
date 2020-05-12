@@ -12,5 +12,5 @@ void loopTick(void) {
   char buffer[200];
   sprintf(buffer, "Clock from variable: %d\r\n", SystemCoreClock);
   CDC_Transmit_FS((uint8_t *)buffer, strlen(buffer) + 1);
-  HAL_Delay(3000);
+  HAL_Delay(1000);
 }
