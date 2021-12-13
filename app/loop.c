@@ -2,10 +2,8 @@
 #include "main.h"
 
 #include "loop.h"
-#include "pins.h"
 
 void loopTick(void) {
-  HAL_GPIO_TogglePin(PIN_PERIPHERAL_LED, PIN_LED_DATA);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_2);
+  HAL_GPIO_TogglePin(OUT_LED_DATA_GPIO_Port, OUT_LED_DATA_Pin);
   HAL_Delay(200);
 }
