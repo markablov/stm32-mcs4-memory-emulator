@@ -10,7 +10,7 @@
  * Pulse width should be (TIM_Period + 1) * (targetPeriod / timerPeriod) - 1 = 227 * (970ms / 1350ms) - 1 = 162
  * Phase offset should be (TIM_Period + 1) * (targetOffset / timerPeriod) - 1 = 227 * (530ms / 1350ms) - 1 = 88
  */
-void initProcessorClocks() {
+void initMCS4Clocks() {
   HAL_TIM_Base_Start(&htim8);
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4);
   HAL_TIM_Base_Start(&htim1);
@@ -19,5 +19,6 @@ void initProcessorClocks() {
 }
 
 void init(void) {
-  initProcessorClocks();
+  initMCS4Clocks();
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
 }
