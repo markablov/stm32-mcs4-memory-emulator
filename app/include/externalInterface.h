@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 void processInputSymbol(uint8_t symbol);
 void initExternalInterface();
 void sendExternalMessage(const char *format, ...);
