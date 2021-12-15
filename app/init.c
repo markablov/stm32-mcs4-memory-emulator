@@ -1,6 +1,7 @@
 #include "main.h"
 #include "tim.h"
 #include "init.h"
+#include "externalInterface.h"
 
 /*
  * For MCS-4 processor we need to provide two-phase clock with period 1350ns (targetFreq = 741kHz) and width 380ns (active LOW)
@@ -20,5 +21,5 @@ void initMCS4Clocks() {
 
 void init(void) {
   initMCS4Clocks();
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
+  initExternalInterface();
 }
