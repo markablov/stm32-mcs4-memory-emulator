@@ -18,6 +18,10 @@ cmake-build-debug
 *.map
 *.exp
 
+# generated linker configuration, except for ours linker file
+*.ld
+!stm32f4.ld
+
 # Precompiled Headers
 *.gch
 *.pch
