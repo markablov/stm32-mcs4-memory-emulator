@@ -12,7 +12,7 @@
 #define MAX_INPUT_MSG_LEN 100
 
 void initExternalInterface() {
-  __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+  __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
 }
 
 void sendExternalMessage(const char *format, ...) {
@@ -22,7 +22,7 @@ void sendExternalMessage(const char *format, ...) {
   char buf[MAX_OUTPUT_MSG_LEN];
 
   vsnprintf(buf, sizeof(buf), format, args);
-  HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 10);
+  HAL_UART_Transmit(&huart3, (uint8_t *)buf, strlen(buf), 10);
 
   va_end(args);
 }
