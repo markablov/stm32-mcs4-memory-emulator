@@ -34,13 +34,13 @@ void sendExternalMessage(const char *format, ...) {
 enum InputStage { InputCommand, InputDataLength, InputData };
 enum InputCommand { CmdNone, CmdStart };
 
-enum InputStage inputStage = InputCommand;
-enum InputCommand inputCommand = CmdNone;
-uint8_t input[MAX_INPUT_MSG_LEN];
-uint8_t inputPos = 0;
-uint8_t *inputData = NULL;
-uint32_t inputDataLen = 0;
-uint32_t inputDataPos = 0;
+static enum InputStage inputStage = InputCommand;
+static enum InputCommand inputCommand = CmdNone;
+static uint8_t input[MAX_INPUT_MSG_LEN];
+static uint8_t inputPos = 0;
+static uint8_t *inputData = NULL;
+static uint32_t inputDataLen = 0;
+static uint32_t inputDataPos = 0;
 
 void processInputSymbol(uint8_t symbol) {
   uint8_t cmdFinished = 0;
