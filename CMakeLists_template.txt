@@ -40,7 +40,7 @@ add_definitions(${defines})
 file(GLOB_RECURSE SOURCES ${sources} "app/*.*")
 
 include_directories(${includes})
-include_directories(app/include app/commands)
+include_directories(app/include app/commands app/emulator)
 
 add_executable($${PROJECT_NAME}.elf $${SOURCES} $${LINKER_SCRIPT})
 
