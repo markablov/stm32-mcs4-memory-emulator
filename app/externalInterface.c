@@ -32,7 +32,7 @@ void sendExternalMessage(const char *format, ...) {
  */
 
 enum InputStage { InputCommand, InputDataLength, InputData };
-enum InputCommand { CmdNone, CmdStart };
+enum InputCommand { CmdNone, CmdStart, CmdStop };
 
 static enum InputStage inputStage = InputCommand;
 static enum InputCommand inputCommand = CmdNone;
@@ -54,6 +54,10 @@ void processInputSymbol(uint8_t symbol) {
         if (strcmp((const char *)input, "START") == 0) {
           inputCommand = CmdStart;
           inputStage = InputDataLength;
+        }
+        if (strcmp((const char *)input, "STOP") == 0) {
+          inputCommand = CmdStop;
+          cmdFinished = 1;
         }
       } else {
         if (symbol != '\r') {
@@ -96,8 +100,14 @@ void processInputSymbol(uint8_t symbol) {
   if (cmdFinished == 1) {
     if (inputCommand == CmdStart) {
       cmdStart(inputData, inputDataLen);
+    } else if (inputCommand == CmdStop) {
+      cmdStop();
     }
-    free(inputData);
+
+    if (inputData) {
+      free(inputData);
+      inputData = NULL;
+    }
 
     // wait for new command
     inputStage = InputCommand;

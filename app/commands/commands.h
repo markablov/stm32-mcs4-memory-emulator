@@ -8,6 +8,7 @@ extern "C" {
 #include <stdint.h>
 
 void cmdStart(uint8_t *data, uint32_t dataLen);
+void cmdStop();
 
 #ifdef __cplusplus
 }
