@@ -12,9 +12,9 @@ uint8_t i4004_readCMRAM() {
 }
 
 uint8_t i4004_readCMROM() {
-  return IN_4004_CMROM_GPIO_Port->IDR & IN_4004_CMROM_Pin;
+  return (IN_4004_CMROM_GPIO_Port->IDR & IN_4004_CMROM_Pin) != 0;
 }
 
 uint8_t i4004_readSync() {
-  return IN_4004_SYNC_GPIO_Port->IDR & IN_4004_SYNC_Pin;
+  return (IN_4004_SYNC_GPIO_Port->IDR & IN_4004_SYNC_Pin) != 0;
 }
