@@ -5,10 +5,9 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-
 void handleCycle();
-uint64_t getCycleCount();
+void printCyclerStats();
+void resetCyclerState();
 
 #ifdef __cplusplus
 }
