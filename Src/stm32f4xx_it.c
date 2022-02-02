@@ -223,7 +223,16 @@ void USART3_IRQHandler(void)
 void TIM8_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM8_CC_IRQn 0 */
+  OUT_TEST_GPIO_Port->BSRR = OUT_TEST_Pin;
+
   handleCycle();
+
+  // do cleanup by ourselves, otherwise it's very long
+  (&htim8)->Instance->SR = ~(TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_COM | TIM_IT_TRIGGER | TIM_IT_BREAK | TIM_IT_UPDATE);
+
+  OUT_TEST_GPIO_Port->BSRR = (uint32_t)OUT_TEST_Pin << 16U;
+
+  return;
   /* USER CODE END TIM8_CC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim8);
   /* USER CODE BEGIN TIM8_CC_IRQn 1 */
