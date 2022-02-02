@@ -84,6 +84,8 @@ void Error_Handler(void);
 #define IN_4004_CMROM_GPIO_Port GPIOA
 #define IN_4004_SYNC_Pin GPIO_PIN_14
 #define IN_4004_SYNC_GPIO_Port GPIOA
+#define OUT_TEST_Pin GPIO_PIN_10
+#define OUT_TEST_GPIO_Port GPIOC
 #define OUT_LED_DATA_Pin GPIO_PIN_12
 #define OUT_LED_DATA_GPIO_Port GPIOC
 #define OUT_4004_D0_Pin GPIO_PIN_3
