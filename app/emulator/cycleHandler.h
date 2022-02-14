@@ -5,9 +5,11 @@
 extern "C" {
 #endif
 
-void handleCycle();
+void handleCyclePhi1Falling();
+void handleCyclePhi2Falling();
 void printCyclerStats();
 void resetCyclerState();
+void stopCycler();
 
 #ifdef __cplusplus
 }
