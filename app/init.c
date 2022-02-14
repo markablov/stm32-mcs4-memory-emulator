@@ -4,12 +4,12 @@
 #include "externalInterface.h"
 
 /*
- * For MCS-4 processor we need to provide two-phase clock with period 1350ns (targetFreq = 741kHz) and width 380ns (active LOW)
- * Distance between two rising (and falling) edges should be: 780ns or 530ns (depends on which clock signal is chosen as first)
+ * For MCS-4 processor we need to provide two-phase clock with period tCY = 1600ns (targetFreq = 625kHz) and width tPW = 420ns (active LOW)
+ * Offset between rising edge of phi1 and rising edge of phi2 should be tD1 + tPW = 380ns + 420ns = 800ns
  *
- * To achieve that master-slave timers are used with same period (frequency): TIM_Period = (timerFreq / targetFreq) - 1 = 168Mhz / 0.741Mhz - 1 = 226
- * Pulse width should be (TIM_Period + 1) * (targetPeriod / timerPeriod) - 1 = 227 * (970ms / 1350ms) - 1 = 162
- * Phase offset should be (TIM_Period + 1) * (targetOffset / timerPeriod) - 1 = 227 * (530ms / 1350ms) - 1 = 88
+ * To achieve that master-slave timers are used with same period (frequency): TIM_Period = (timerFreq / targetFreq) - 1 = 168Mhz / 0.625Mhz - 1 = 268
+ * Pulse width should be (TIM_Period + 1) * (targetPeriod / timerPeriod) - 1 = 269 * ((1600ns - 420ns) / 1600ns) - 1 = 197
+ * Phase offset should be (TIM_Period + 1) * (targetOffset / timerPeriod) - 1 = 269 * (800ns / 1600ns) - 1 = 133
  *
  * Interrupts:
  *   TIM1 Update - phi1 raising
@@ -23,7 +23,7 @@ void initMCS4Clocks() {
   HAL_TIM_Base_Start(&htim8);
   HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_4);
   HAL_TIM_Base_Start(&htim1);
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start_IT(&htim1, TIM_CHANNEL_1);
   HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_2);
 }
 
