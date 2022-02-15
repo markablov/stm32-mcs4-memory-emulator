@@ -8,7 +8,7 @@ extern "C" {
 void handleCyclePhi1Falling();
 void handleCyclePhi2Falling();
 void printCyclerStats();
-void resetCyclerState();
+void runCycler();
 void stopCycler();
 
 #ifdef __cplusplus
