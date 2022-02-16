@@ -15,6 +15,11 @@ void initExternalInterface() {
   __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
 }
 
+void sendByteFast(uint8_t symbol) {
+  // even don't wait for TXE bit, just fire-and-forget
+  huart3.Instance->DR = symbol;
+}
+
 void sendExternalMessage(const char *format, ...) {
   va_list args;
   va_start(args, format);
