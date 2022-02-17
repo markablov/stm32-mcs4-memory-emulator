@@ -5,6 +5,6 @@
 
 void cmdStop() {
   stopCycler();
-  sendExternalMessage("\r\nSTOP command has been received\r\n");
+  sendExternalMessage("\xFF\xFF\xFF\xFFSTOP command has been received\r\n");
   printCyclerStats();
 }

@@ -5,7 +5,7 @@
 #include "commands.h"
 
 void cmdStart(uint8_t *data, uint32_t dataLen) {
-  sendExternalMessage("START command has been received, RAM dump size is %d bytes\r\n", dataLen);
+  sendExternalMessage("START command has been received, RAM dump size is %d bytes\r\nBINARY_START", dataLen);
   initROM(data, dataLen);
   runCycler();
 }
