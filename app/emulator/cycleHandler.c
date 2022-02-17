@@ -29,6 +29,9 @@ static volatile uint8_t ramBankToSetAccessAddress = 0xFF;
 // RAM/ROM bank, that would be used for RAM/IO instruction
 static volatile uint8_t ramBankToExecuteInstruction = 0xFF;
 
+/*
+ * Print some statistics and logs about current run of i4004
+ */
 void printCyclerStats() {
   sendExternalMessage("Instruction cycles processed = %08X%08X\r\n", (uint32_t)(instructionCount >> 32U), (uint32_t)(instructionCount & 0xFFFFFFFF));
 }
@@ -40,17 +43,60 @@ void runCycler() {
   state = StateResetting;
 }
 
+/*
+ * Stop i4004 (via RESET pin)
+ */
 void stopCycler() {
   HAL_GPIO_WritePin(OUT_4004_RESET_GPIO_Port, OUT_4004_RESET_Pin, GPIO_PIN_RESET);
   state = StateStale;
 }
 
+/*
+ * Actually run i4004 (by setting RESET pin)
+ */
 static void startCycler() {
   HAL_GPIO_WritePin(OUT_4004_RESET_GPIO_Port, OUT_4004_RESET_Pin, GPIO_PIN_SET);
   instructionCount = 0;
   state = StateRunning;
 }
 
+/*
+ * Convert CMRAM lines into RAM bank number
+ */
+static uint8_t getRAMBankNoFromCMRAM(uint8_t cmram) {
+  switch (cmram) {
+    case 0b0000:
+      return 0xFF;
+    case 0b0010:
+      // CM_RAM1 => bank #1
+      return 1;
+    case 0b0100:
+      // CM_RAM2 => bank #2
+      return 2;
+    case 0b1000:
+      // CM_RAM3 => bank #3
+      return 3;
+    case 0b0110:
+      // CM_RAM1 + CM_RAM2 => bank #4
+      return 4;
+    case 0b1010:
+      // CM_RAM1 + CM_RAM3 => bank #5
+      return 5;
+    case 0b1100:
+      // CM_RAM2 + CM_RAM3 => bank #6
+      return 6;
+    case 0b1110:
+      // CM_RAM1 + CM_RAM2 + CM_RAM3 => bank #7
+      return 7;
+    default:
+      // if CM_RAM0 set, it always mean bank #0
+      return 0;
+  }
+}
+
+/*
+ * Emulate execution of RAM/IO instructions (done by 4001/4002 in real systems)
+ */
 static void executeRAMInstruction() {
   switch (currentROMByte) {
     // RD0
@@ -72,6 +118,9 @@ static void executeRAMInstruction() {
   }
 }
 
+/*
+ * First phase when we want to proceed some actions (read data pins / emulate instruction execution / ...)
+ */
 void handleCyclePhi1Falling() {
   if (i4004_readSync()) {
     instructionCount++;
@@ -103,8 +152,7 @@ void handleCyclePhi1Falling() {
       break;
     case StageM2: {
       // if there is CMRAM lines active due M2 it means that IO/RAM instruction is executing
-      uint8_t cmram = i4004_readCMRAM();
-      ramBankToExecuteInstruction = cmram == 0 ? 0xFF : 0;
+      ramBankToExecuteInstruction = getRAMBankNoFromCMRAM(i4004_readCMRAM());
       nextStage = StageX1;
       break;
     }
@@ -132,6 +180,9 @@ void handleCyclePhi1Falling() {
   }
 }
 
+/*
+ * Second phase when we want to proceed some actions (output ROM content / select RAM registers / ...)
+ */
 void handleCyclePhi2Falling() {
   if (state != StateRunning) {
     currentStage = nextStage;
@@ -158,14 +209,10 @@ void handleCyclePhi2Falling() {
       break;
     case StageX2: {
       // if there is CMRAM lines active due X2 it means that SRC instruction is executing
-      uint8_t cmram = i4004_readCMRAM();
-      if (cmram != 0) {
-        ramBankToSetAccessAddress = 0;
+      ramBankToSetAccessAddress = getRAMBankNoFromCMRAM(i4004_readCMRAM());
+      if (ramBankToSetAccessAddress != 0xFF) {
         RAM_selectRegister(ramBankToSetAccessAddress, i4004_readDataBus());
-      } else {
-        ramBankToSetAccessAddress = 0xFF;
       }
-
       break;
     }
     case StageX3:
