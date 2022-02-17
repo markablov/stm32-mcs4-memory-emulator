@@ -4,6 +4,7 @@
 #include "externalInterface.h"
 #include "i4004Interface.h"
 #include "romEmulator.h"
+#include "ramEmulator.h"
 
 #include "cycleHandler.h"
 
@@ -28,21 +29,8 @@ static volatile uint8_t ramBankToSetAccessAddress = 0xFF;
 // RAM/ROM bank, that would be used for RAM/IO instruction
 static volatile uint8_t ramBankToExecuteInstruction = 0xFF;
 
-static volatile uint16_t addressLog[20];
-static volatile uint8_t dataBusLog[20];
-static volatile uint8_t ptr = 0;
-
 void printCyclerStats() {
   sendExternalMessage("Instruction cycles processed = %08X%08X\r\n", (uint32_t)(instructionCount >> 32U), (uint32_t)(instructionCount & 0xFFFFFFFF));
-
-  for (uint8_t i = 0; i < 19; i++) {
-    sendExternalMessage(
-      "ROM access %02d: by address %04X returned %02X\r\n",
-      i,
-      addressLog[i],
-      dataBusLog[i]
-    );
-  }
 }
 
 /*
@@ -61,7 +49,27 @@ static void startCycler() {
   HAL_GPIO_WritePin(OUT_4004_RESET_GPIO_Port, OUT_4004_RESET_Pin, GPIO_PIN_SET);
   instructionCount = 0;
   state = StateRunning;
-  ptr = 0;
+}
+
+static void executeRAMInstruction() {
+  switch (currentROMByte) {
+    // RD0
+    case 0xEC:
+      i4004_writeDataBus(RAM_readStatusCharacter(ramBankToExecuteInstruction, 0));
+      break;
+    // WR0
+    case 0xE4:
+      RAM_writeStatusCharacter(ramBankToExecuteInstruction, 0, i4004_readDataBus());
+      break;
+      // WMP
+    case 0xE1:
+      delayedRAMOutputBytePresence = 1;
+      delayedRAMOutputByte = i4004_readDataBus();
+      break;
+
+    default:
+      break;
+  }
 }
 
 void handleCyclePhi1Falling() {
@@ -70,7 +78,7 @@ void handleCyclePhi1Falling() {
     // current stage is X3
     currentStage = StageX3;
     if (ramBankToSetAccessAddress != 0xFF) {
-      // select character (one if 16) at selected RAM bank
+      RAM_selectCharacter(ramBankToSetAccessAddress, i4004_readDataBus());
     }
 
     nextStage = StageA1;
@@ -112,30 +120,13 @@ void handleCyclePhi1Falling() {
         return;
       }
 
-      // if there is CMRAM lines active due X2 it means that SRC instruction is executing
-      uint8_t cmram = i4004_readCMRAM();
-      if (cmram != 0) {
-        ramBankToSetAccessAddress = 0;
-        // select register (one if 16) at selected RAM bank
-      } else {
-        ramBankToSetAccessAddress = 0xFF;
+      // there is IO/RAM operation, need to process that by RAM
+      if (ramBankToExecuteInstruction != 0xFF) {
+        executeRAMInstruction();
       }
 
       break;
     }
-    default:
-      break;
-  }
-}
-
-static void executeRAMInstruction() {
-  switch (currentROMByte) {
-    // WMP instruction
-    case 0xE1:
-      delayedRAMOutputBytePresence = 1;
-      delayedRAMOutputByte = i4004_readDataBus();
-      break;
-
     default:
       break;
   }
@@ -165,18 +156,22 @@ void handleCyclePhi2Falling() {
       while ((OUT_4004_PHI2_GPIO_Port->IDR & OUT_4004_PHI2_Pin) == 0);
       i4004_writeDataBus(currentROMByte & 0xFU);
       break;
-    case StageM2:
-      addressLog[ptr] = currentAddress;
-      dataBusLog[ptr] = currentROMByte;
-      if (ptr < 19) {
-        ptr++;
+    case StageX2: {
+      // if there is CMRAM lines active due X2 it means that SRC instruction is executing
+      uint8_t cmram = i4004_readCMRAM();
+      if (cmram != 0) {
+        ramBankToSetAccessAddress = 0;
+        RAM_selectRegister(ramBankToSetAccessAddress, i4004_readDataBus());
+      } else {
+        ramBankToSetAccessAddress = 0xFF;
       }
+
       break;
-    case StageX2:
-      // there is IO/RAM operation, need to process that by RAM
-      if (ramBankToExecuteInstruction != 0xFF) {
-        executeRAMInstruction();
-      }
+    }
+    case StageX3:
+      // wait for phi2 rising stage, otherwise i4004 can miss data
+      while ((OUT_4004_PHI2_GPIO_Port->IDR & OUT_4004_PHI2_Pin) == 0);
+      i4004_freeDataBus();
       break;
     default:
       break;
