@@ -11,13 +11,14 @@
 #define MAX_OUTPUT_MSG_LEN 100
 #define MAX_INPUT_MSG_LEN 100
 
+#define UART_TRANSMIT_TIMEOUT 100
+
 void initExternalInterface() {
   __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
 }
 
-void sendByteFast(uint8_t symbol) {
-  // even don't wait for TXE bit, just fire-and-forget
-  huart3.Instance->DR = symbol;
+void sendExternalBytes(uint8_t *data, uint16_t len) {
+  HAL_UART_Transmit(&huart3, data, len, UART_TRANSMIT_TIMEOUT);
 }
 
 void sendExternalMessage(const char *format, ...) {
@@ -27,7 +28,7 @@ void sendExternalMessage(const char *format, ...) {
   char buf[MAX_OUTPUT_MSG_LEN];
 
   vsnprintf(buf, sizeof(buf), format, args);
-  HAL_UART_Transmit(&huart3, (uint8_t *)buf, strlen(buf), 10);
+  sendExternalBytes((uint8_t *)buf, (uint16_t)strlen(buf));
 
   va_end(args);
 }

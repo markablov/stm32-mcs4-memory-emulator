@@ -10,7 +10,7 @@ extern "C" {
 void processInputSymbol(uint8_t symbol);
 void initExternalInterface();
 void sendExternalMessage(const char *format, ...);
-void sendByteFast(uint8_t symbol);
+void sendExternalBytes(uint8_t *data, uint16_t len);
 
 #ifdef __cplusplus
 }

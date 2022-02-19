@@ -5,6 +5,7 @@
 #include "i4004Interface.h"
 #include "romEmulator.h"
 #include "ramEmulator.h"
+#include "isrRingBuffer.h"
 
 #include "cycleHandler.h"
 
@@ -19,10 +20,6 @@ static volatile CycleStage nextStage = StageA1;
 
 static volatile uint16_t currentAddress = 0;
 static volatile uint8_t currentROMByte = 0;
-
-// better to send RAM outputs in some idle stage
-static volatile uint8_t delayedRAMOutputByte = 0;
-static volatile uint8_t delayedRAMOutputBytePresence = 0;
 
 // RAM/ROM bank, that would be used for SRC instruction
 static volatile uint8_t ramBankToSetAccessAddress = 0xFF;
@@ -107,10 +104,10 @@ static void executeRAMInstruction() {
     case 0xE4:
       RAM_writeStatusCharacter(ramBankToExecuteInstruction, 0, i4004_readDataBus());
       break;
-      // WMP
+    // WMP
     case 0xE1:
-      delayedRAMOutputBytePresence = 1;
-      delayedRAMOutputByte = i4004_readDataBus();
+      isrRingBuffer[isrRingBufferWritePtr] = i4004_readDataBus();
+      isrRingBufferWritePtr = (isrRingBufferWritePtr + 1) % ISR_RING_BUFFER_LENGTH;
       break;
 
     default:
@@ -190,12 +187,6 @@ void handleCyclePhi2Falling() {
   }
 
   switch (currentStage) {
-    case StageA1:
-      if (delayedRAMOutputBytePresence) {
-        delayedRAMOutputBytePresence = 0;
-        sendByteFast(delayedRAMOutputByte);
-      }
-      break;
     case StageA3:
       currentROMByte = readROM(currentAddress);
       // wait for phi2 rising stage, otherwise i4004 can miss data
