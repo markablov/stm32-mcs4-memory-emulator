@@ -18,8 +18,14 @@ void sendDataThroughUARTIfNecessary() {
   isrRingBufferReadPtr = (readPtr + len) % ISR_RING_BUFFER_LENGTH;
 }
 
+static uint32_t lastToggleTick = 0;
+
 void loopTick(void) {
   sendDataThroughUARTIfNecessary();
-  HAL_GPIO_TogglePin(OUT_LED_DATA_GPIO_Port, OUT_LED_DATA_Pin);
-  HAL_Delay(1000);
+
+  // flash LED
+  if (!lastToggleTick || (HAL_GetTick() - lastToggleTick) > 1000) {
+    HAL_GPIO_TogglePin(OUT_LED_DATA_GPIO_Port, OUT_LED_DATA_Pin);
+    lastToggleTick = HAL_GetTick();
+  }
 }
