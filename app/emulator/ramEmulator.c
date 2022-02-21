@@ -1,3 +1,5 @@
+#include "externalInterface.h"
+
 #include "ramEmulator.h"
 
 typedef struct {
@@ -13,6 +15,26 @@ typedef struct {
 } RAMBank;
 
 static RAMBank banks[8];
+
+void printRAM() {
+  for (uint8_t bankNo = 0; bankNo < 8; bankNo++) {
+    RAMBank *bank = &banks[bankNo];
+    sendExternalMessage("Bank #%d, selected register is %d, selected character is %d\r\n", bankNo, bank->selectedRegister, bank->selectedCharacter);
+    for (uint8_t regNo = 0; regNo < 16; regNo++) {
+      RAMRegister *reg = &bank->registers[regNo];
+      uint8_t *mainChars = reg->mainCharacters;
+      uint8_t *statusChars = reg->statusCharacters;
+
+      sendExternalMessage(
+        "  Reg #%02d, main [%X, %X, %X, %X, %X, %X, %X, %X, %X, %X, %X, %X, %X, %X, %X, %X], status [%X, %X, %X, %X]\r\n",
+        regNo,
+        mainChars[0], mainChars[1], mainChars[2], mainChars[3], mainChars[4], mainChars[5], mainChars[6], mainChars[7],
+        mainChars[8], mainChars[9], mainChars[10], mainChars[11], mainChars[12], mainChars[13], mainChars[14], mainChars[15],
+        statusChars[0], statusChars[1], statusChars[2], statusChars[3]
+      );
+    }
+  }
+}
 
 void RAM_selectRegister(uint8_t bankNo, uint8_t regNo) {
   banks[bankNo].selectedRegister = regNo;
