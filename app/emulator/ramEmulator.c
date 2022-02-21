@@ -36,6 +36,29 @@ void printRAM() {
   }
 }
 
+void clearRAM() {
+  for (uint8_t bankNo = 0; bankNo < 8; bankNo++) {
+    RAMBank *bank = &banks[bankNo];
+    bank->selectedRegister = 0;
+    bank->selectedCharacter = 0;
+
+    for (uint8_t regNo = 0; regNo < 16; regNo++) {
+      RAMRegister *reg = &bank->registers[regNo];
+
+      uint8_t *mainChars = reg->mainCharacters;
+      for (uint8_t charNo = 0; charNo < 16; charNo++) {
+        mainChars[charNo] = 0;
+      }
+
+      uint8_t *statusChars = reg->statusCharacters;
+      statusChars[0] = 0;
+      statusChars[1] = 0;
+      statusChars[2] = 0;
+      statusChars[3] = 0;
+    }
+  }
+}
+
 void RAM_selectRegister(uint8_t bankNo, uint8_t regNo) {
   banks[bankNo].selectedRegister = regNo;
 }

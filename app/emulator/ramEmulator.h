@@ -8,6 +8,7 @@ extern "C" {
 #include <stdint.h>
 
 void printRAM();
+void clearRAM();
 
 void RAM_selectRegister(uint8_t bankNo, uint8_t regNo);
 void RAM_selectCharacter(uint8_t bankNo, uint8_t charNo);
