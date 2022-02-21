@@ -72,7 +72,17 @@ uint8_t RAM_readStatusCharacter(uint8_t bankNo, uint8_t statusCharNo) {
   return bank->registers[bank->selectedRegister].statusCharacters[statusCharNo];
 }
 
+uint8_t RAM_readMainCharacter(uint8_t bankNo) {
+  RAMBank * bank = &banks[bankNo];
+  return bank->registers[bank->selectedRegister].mainCharacters[bank->selectedCharacter];
+}
+
 void RAM_writeStatusCharacter(uint8_t bankNo, uint8_t statusCharNo, uint8_t value) {
   RAMBank * bank = &banks[bankNo];
   bank->registers[bank->selectedRegister].statusCharacters[statusCharNo] = value;
+}
+
+void RAM_writeMainCharacter(uint8_t bankNo, uint8_t value) {
+  RAMBank * bank = &banks[bankNo];
+  bank->registers[bank->selectedRegister].mainCharacters[bank->selectedCharacter] = value;
 }

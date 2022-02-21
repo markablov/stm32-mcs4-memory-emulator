@@ -96,13 +96,47 @@ static uint8_t getRAMBankNoFromCMRAM(uint8_t cmram) {
  */
 static void executeRAMInstruction() {
   switch (currentROMByte) {
+    // RDM / SBM / ADM
+    case 0xE8:
+    case 0xE9:
+    case 0xEB:
+      i4004_writeDataBus(RAM_readMainCharacter(ramBankToExecuteInstruction));
+      break;
     // RD0
     case 0xEC:
       i4004_writeDataBus(RAM_readStatusCharacter(ramBankToExecuteInstruction, 0));
       break;
+    // RD1
+    case 0xED:
+      i4004_writeDataBus(RAM_readStatusCharacter(ramBankToExecuteInstruction, 1));
+      break;
+    // RD2
+    case 0xEE:
+      i4004_writeDataBus(RAM_readStatusCharacter(ramBankToExecuteInstruction, 2));
+      break;
+    // RD3
+    case 0xEF:
+      i4004_writeDataBus(RAM_readStatusCharacter(ramBankToExecuteInstruction, 3));
+      break;
+    // WRM
+    case 0xE0:
+      RAM_writeMainCharacter(ramBankToExecuteInstruction, i4004_readDataBus());
+      break;
     // WR0
     case 0xE4:
       RAM_writeStatusCharacter(ramBankToExecuteInstruction, 0, i4004_readDataBus());
+      break;
+    // WR1
+    case 0xE5:
+      RAM_writeStatusCharacter(ramBankToExecuteInstruction, 1, i4004_readDataBus());
+      break;
+    // WR2
+    case 0xE6:
+      RAM_writeStatusCharacter(ramBankToExecuteInstruction, 2, i4004_readDataBus());
+      break;
+    // WR3
+    case 0xE7:
+      RAM_writeStatusCharacter(ramBankToExecuteInstruction, 3, i4004_readDataBus());
       break;
     // WMP
     case 0xE1:
