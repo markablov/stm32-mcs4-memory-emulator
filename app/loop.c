@@ -6,8 +6,8 @@
 
 void sendDataThroughUARTIfNecessary() {
   // save in function context, to avoid race condition with volatile variables
-  uint8_t writePtr = isrRingBufferWritePtr;
-  uint8_t readPtr = isrRingBufferReadPtr;
+  uint16_t writePtr = isrRingBufferWritePtr;
+  uint16_t readPtr = isrRingBufferReadPtr;
 
   if (readPtr == writePtr) {
     return;

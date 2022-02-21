@@ -7,13 +7,13 @@ extern "C" {
 
 #include <stdint.h>
 
-#define ISR_RING_BUFFER_LENGTH 128
+#define ISR_RING_BUFFER_LENGTH 1024
 
 extern uint8_t isrRingBuffer[ISR_RING_BUFFER_LENGTH];
 
 // could be updated in ISR
-extern volatile uint8_t isrRingBufferWritePtr;
-extern volatile uint8_t isrRingBufferReadPtr;
+extern volatile uint16_t isrRingBufferWritePtr;
+extern volatile uint16_t isrRingBufferReadPtr;
 
 #ifdef __cplusplus
 }
