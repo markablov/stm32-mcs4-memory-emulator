@@ -207,10 +207,15 @@ void SysTick_Handler(void)
 void TIM1_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_CC_IRQn 0 */
+  OUT_TEST_GPIO_Port->BSRR = (uint32_t)OUT_TEST_Pin;
+
   handleCyclePhi1Falling();
 
   // do cleanup by ourselves, otherwise it's very long
   (&htim1)->Instance->SR = ~(TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_COM | TIM_IT_TRIGGER | TIM_IT_BREAK | TIM_IT_UPDATE);
+
+  OUT_TEST_GPIO_Port->BSRR = (uint32_t)OUT_TEST_Pin << 16U;
+
   return;
   /* USER CODE END TIM1_CC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
@@ -242,10 +247,15 @@ void USART3_IRQHandler(void)
 void TIM8_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM8_CC_IRQn 0 */
+  OUT_TEST2_GPIO_Port->BSRR = (uint32_t)OUT_TEST2_Pin;
+
   handleCyclePhi2Falling();
 
   // do cleanup by ourselves, otherwise it's very long
   (&htim8)->Instance->SR = ~(TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_COM | TIM_IT_TRIGGER | TIM_IT_BREAK | TIM_IT_UPDATE);
+
+  OUT_TEST2_GPIO_Port->BSRR = (uint32_t)OUT_TEST2_Pin << 16U;
+
   return;
   /* USER CODE END TIM8_CC_IRQn 0 */
   HAL_TIM_IRQHandler(&htim8);
