@@ -2,24 +2,16 @@
 
 #include "ramEmulator.h"
 
-typedef struct {
-  uint8_t mainCharacters[16];
-  uint8_t statusCharacters[4];
-} RAMRegister;
+RAMBank banks[8];
 
-typedef struct {
-  // real 4002 has 4 registers, so in our emulation each bank has 4 chips for 4 registers = 16 registers in total
-  RAMRegister registers[16];
-  uint8_t selectedRegister;
-  uint8_t selectedCharacter;
-} RAMBank;
-
-static RAMBank banks[8];
+volatile RAMBank *selectedBank = &banks[0];
+volatile uint8_t *selectedStatusCharacters = banks[0].registers[0].statusCharacters;
+volatile uint8_t *selectedCharacter = &(banks[0].registers[0].mainCharacters[0]);
 
 void printRAM() {
   for (uint8_t bankNo = 0; bankNo < 8; bankNo++) {
     RAMBank *bank = &banks[bankNo];
-    sendExternalMessage("Bank #%d, selected register is %d, selected character is %d\r\n", bankNo, bank->selectedRegister, bank->selectedCharacter);
+    sendExternalMessage("Bank #%d\r\n", bankNo);
     for (uint8_t regNo = 0; regNo < 16; regNo++) {
       RAMRegister *reg = &bank->registers[regNo];
       uint8_t *mainChars = reg->mainCharacters;
@@ -39,8 +31,8 @@ void printRAM() {
 void clearRAM() {
   for (uint8_t bankNo = 0; bankNo < 8; bankNo++) {
     RAMBank *bank = &banks[bankNo];
-    bank->selectedRegister = 0;
-    bank->selectedCharacter = 0;
+    bank->selectedStatusCharacters = bank->registers[0].statusCharacters;
+    bank->selectedCharacter = &(bank->registers[0].mainCharacters[0]);
 
     for (uint8_t regNo = 0; regNo < 16; regNo++) {
       RAMRegister *reg = &bank->registers[regNo];
@@ -57,32 +49,4 @@ void clearRAM() {
       statusChars[3] = 0;
     }
   }
-}
-
-void RAM_selectRegister(uint8_t bankNo, uint8_t regNo) {
-  banks[bankNo].selectedRegister = regNo;
-}
-
-void RAM_selectCharacter(uint8_t bankNo, uint8_t charNo) {
-  banks[bankNo].selectedCharacter = charNo;
-}
-
-uint8_t RAM_readStatusCharacter(uint8_t bankNo, uint8_t statusCharNo) {
-  RAMBank * bank = &banks[bankNo];
-  return bank->registers[bank->selectedRegister].statusCharacters[statusCharNo];
-}
-
-uint8_t RAM_readMainCharacter(uint8_t bankNo) {
-  RAMBank * bank = &banks[bankNo];
-  return bank->registers[bank->selectedRegister].mainCharacters[bank->selectedCharacter];
-}
-
-void RAM_writeStatusCharacter(uint8_t bankNo, uint8_t statusCharNo, uint8_t value) {
-  RAMBank * bank = &banks[bankNo];
-  bank->registers[bank->selectedRegister].statusCharacters[statusCharNo] = value;
-}
-
-void RAM_writeMainCharacter(uint8_t bankNo, uint8_t value) {
-  RAMBank * bank = &banks[bankNo];
-  bank->registers[bank->selectedRegister].mainCharacters[bank->selectedCharacter] = value;
 }

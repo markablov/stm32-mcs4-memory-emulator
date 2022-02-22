@@ -7,17 +7,26 @@ extern "C" {
 
 #include <stdint.h>
 
+typedef struct {
+  uint8_t mainCharacters[16];
+  uint8_t statusCharacters[4];
+} RAMRegister;
+
+typedef struct {
+  // real 4002 has 4 registers, so in our emulation each bank has 4 chips for 4 registers = 16 registers in total
+  RAMRegister registers[16];
+  volatile uint8_t *selectedStatusCharacters;
+  volatile uint8_t *selectedCharacter;
+} RAMBank;
+
+extern RAMBank banks[8];
+
+extern volatile RAMBank *selectedBank;
+extern volatile uint8_t *selectedStatusCharacters;
+extern volatile uint8_t *selectedCharacter;
+
 void printRAM();
 void clearRAM();
-
-void RAM_selectRegister(uint8_t bankNo, uint8_t regNo);
-void RAM_selectCharacter(uint8_t bankNo, uint8_t charNo);
-
-uint8_t RAM_readStatusCharacter(uint8_t bankNo, uint8_t statusCharNo);
-uint8_t RAM_readMainCharacter(uint8_t bankNo);
-
-void RAM_writeStatusCharacter(uint8_t bankNo, uint8_t statusCharNo, uint8_t value);
-void RAM_writeMainCharacter(uint8_t bankNo, uint8_t value);
 
 #ifdef __cplusplus
 }
