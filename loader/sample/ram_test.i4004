@@ -1,0 +1,56 @@
+  // WRITE CYCLE
+  FIM r0, 0x80
+loop_bank:
+  // select bank
+  LD rr1
+  DCL
+  // iterate through reg number
+  FIM r1, 0x00
+loop_reg:
+  LDM 0
+  XCH rr3
+  SRC r1
+  LD rr1
+  WRM // write rr1 to [#rr1, #rr2, M0]
+  WR0 // write rr1 to [#rr1, #rr2, S0]
+  INC rr3
+  SRC r1
+  LD rr2
+  WRM // write rr2 to [#rr1, #rr2, M1]
+  WR1 // write rr2 to [#rr1, #rr2, S1]
+  ISZ rr2, loop_reg
+  // end of loop_reg
+  INC rr1
+  ISZ rr0, loop_bank
+
+  // READ CYCLE
+  FIM r0, 0x80
+loop_bank2:
+  // select bank
+  LD rr1
+  DCL
+  // iterate through reg number
+  FIM r1, 0x00
+loop_reg2:
+  LDM 0
+  XCH rr3
+  SRC r1
+  LD rr1
+  RDM // read from [#rr1, #rr2, M0]
+  WMP
+  RD0 // read from [#rr1, #rr2, S0]
+  WMP
+  INC rr3
+  SRC r1
+  LD rr2
+  RDM // read from [#rr1, #rr2, M1]
+  WMP
+  RD1 // read from [#rr1, #rr2, S1]
+  WMP
+  ISZ rr2, loop_reg2
+  // end of loop_reg2
+  INC rr1
+  ISZ rr0, loop_bank2
+
+halt:
+  JUN halt

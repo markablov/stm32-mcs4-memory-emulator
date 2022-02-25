@@ -1,0 +1,9 @@
+  LDM 1
+  XCH rr0
+loop:
+  FIM r1, 0xF0
+  SRC r1
+  INC rr0
+  LD rr0
+  WMP
+  JUN loop
